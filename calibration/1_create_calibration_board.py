@@ -1,6 +1,8 @@
 # File to create ArUco grid for camera calibration
 # Running the script will create board.png
 # Print board.png and begin the calibration process
+# Parameters taken from https://docs.opencv.org/master/db/da9/tutorial_aruco_board_detection.html
+# This will create a board with markers 0 - 34
 
 import cv2
 from cv2 import aruco
