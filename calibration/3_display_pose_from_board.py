@@ -21,10 +21,9 @@ camera_matrix = np.array([[929.13251611,   0.,         479.17562521],
 distortion_coefficients = np.array([[ 1.35915086e-01, -2.23009579e+00, -1.37639118e-02, -2.29458613e-03,
    8.38818104e+00]])
 
-# Get the width & height of camera stream
-camera = cv2.VideoCapture(0)
-ret, img = camera.read()
-h, w = img.shape[:2]
+# Get the video stream
+#camera = cv2.VideoCapture(0) # webcam
+camera = cv2.VideoCapture('udp://127.0.0.1:11111') # Tello
 
 while True:
     ret, img = camera.read()
@@ -47,10 +46,3 @@ while True:
         break
 
 cv2.destroyAllWindows()
-
-def draw(img, corners, imgpts):
-    corner = tuple(corners[0].ravel())
-    img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
-    img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
-    img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
-    return img

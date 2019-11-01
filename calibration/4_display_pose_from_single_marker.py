@@ -13,11 +13,9 @@ camera_matrix = np.array([[929.13251611,   0.,         479.17562521],
 distortion_coefficients = np.array([[ 1.35915086e-01, -2.23009579e+00, -1.37639118e-02, -2.29458613e-03,
    8.38818104e+00]])
 
-# Get the width & height of camera stream
-camera = cv2.VideoCapture(0)
-ret, img = camera.read()
-h, w = img.shape[:2]
-print(h, ":", w)
+# Get the video stream
+#camera = cv2.VideoCapture(0) # webcam
+camera = cv2.VideoCapture('udp://127.0.0.1:11111') # Tello
 
 while True:
     ret, img = camera.read()
@@ -32,7 +30,6 @@ while True:
         # In case there are multiple markers
         for i in range(ids.size):
             img_aruco = aruco.drawAxis(img_aruco, camera_matrix, distortion_coefficients, rvec[i], tvec[i], marker_length)
-            print(tvec[i])
 
         #img_aruco = cv2.line(img_aruco, (0, 0), (int(x*10), int(y*10)), (0,0,255), 3)
 
