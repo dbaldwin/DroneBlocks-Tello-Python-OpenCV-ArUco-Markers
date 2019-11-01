@@ -15,6 +15,7 @@ distortion_coefficients = np.array( [[ 0.02255412, -0.2682463,  -0.00997881,  0.
 camera = cv2.VideoCapture(0)
 ret, img = camera.read()
 h, w = img.shape[:2]
+print(h, ":", w)
 
 while True:
     ret, img = camera.read()
@@ -29,8 +30,11 @@ while True:
         # In case there are multiple markers
         for i in range(ids.size):
             img_aruco = aruco.drawAxis(img_aruco, camera_matrix, distortion_coefficients, rvec[i], tvec[i], 2)
+            print(tvec[i])
 
-        print("rvec: ", rvec)
+        #img_aruco = cv2.line(img_aruco, (0, 0), (int(x*10), int(y*10)), (0,0,255), 3)
+
+        #print("rvec: ", rvec)
         print("tvec: ", tvec)
 
     else:

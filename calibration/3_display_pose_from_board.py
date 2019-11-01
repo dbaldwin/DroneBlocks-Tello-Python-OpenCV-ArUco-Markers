@@ -10,7 +10,7 @@ calibration_photo_path = root.joinpath("photos")
 aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
 aruco_params =  aruco.DetectorParameters_create()
 
-board = aruco.GridBoard_create(5, 7, 4, 1, aruco_dict)
+board = aruco.GridBoard_create(5, 7, .04, .02, aruco_dict)
 
 camera_matrix = np.array([[927.32436751,    0.,         491.7253811],
   [  0.,         927.60209717, 302.39067493],
@@ -44,3 +44,10 @@ while True:
         break
 
 cv2.destroyAllWindows()
+
+def draw(img, corners, imgpts):
+    corner = tuple(corners[0].ravel())
+    img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
+    img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
+    img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
+    return img

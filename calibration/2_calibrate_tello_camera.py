@@ -14,7 +14,7 @@ aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
 aruco_params =  aruco.DetectorParameters_create()
 
 # Params used to generate original board
-board = aruco.GridBoard_create(5, 7, 4, 1, aruco_dict)
+board = aruco.GridBoard_create(5, 7, .04, .02, aruco_dict)
 
 photo_list = []
 calibration_photos = calibration_photo_path.glob('*.jpg')
