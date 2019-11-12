@@ -58,12 +58,37 @@ while True:
             if p3 is not None:
                 cv2.circle(img_aruco, p3, 5, (255, 0, 0), -1)
 
+            # Plot a point at the center
+            cv2.circle(img_aruco, (480, 320), 5, (0, 255, 0), -1)
+
             tvec_x = tvec[0][0][0]
             tvec_y = tvec[0][0][1]
             tvec_z = tvec[0][0][2]
 
-            # Distance from camera
+            # Distance from camera is the magnitude of tvec
             distance = math.sqrt(tvec_x*tvec_x + tvec_y*tvec_y + tvec_z*tvec_z)
+
+            # Let's focus on keeping the marker centered on the x axis (roll left/right)
+            # This means we'll consider y and z constant for this demonstration
+
+            # Calculate angle of vectors
+            array = np.array([tvec_x, tvec_y, tvec_z])
+            array_mag = np.linalg.norm(array)
+
+            # Vector to center of screen
+            array2 = np.array([0, 0, tvec_z])
+            array2_mag = np.linalg.norm(array2)
+
+            dot = np.dot(array, array2)
+
+            # Solve for angle
+            cos = np.arccos(dot/(array_mag*array2_mag))
+
+            degrees = np.degrees(cos)
+
+            #print(degrees)
+
+
 
 
         #for p in marker_corners:
