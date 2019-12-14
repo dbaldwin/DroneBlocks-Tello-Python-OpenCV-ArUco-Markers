@@ -4,7 +4,7 @@ import time
 
 
 file_path = os.getcwd()
-#cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture(0) # webcam
 cap = cv2.VideoCapture('udp://127.0.0.1:11111') # Tello video from stream
 #cap = cv2.VideoCapture('../videos/tello.avi') # Tello video from file
 

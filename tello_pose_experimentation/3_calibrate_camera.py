@@ -1,7 +1,3 @@
-# System information:
-# - Linux Mint 18.1 Cinnamon 64-bit
-# - Python 2.7 with OpenCV 3.2.0
-
 import numpy
 import cv2
 from cv2 import aruco
@@ -12,7 +8,7 @@ import glob
 # ChAruco board variables
 CHARUCOBOARD_ROWCOUNT = 7
 CHARUCOBOARD_COLCOUNT = 5 
-ARUCO_DICT = aruco.Dictionary_get(aruco.DICT_5X5_1000)
+ARUCO_DICT = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
 
 # Create constants to be passed into OpenCV and Aruco methods
 CHARUCO_BOARD = aruco.CharucoBoard_create(
@@ -125,4 +121,4 @@ pickle.dump((cameraMatrix, distCoeffs, rvecs, tvecs), f)
 f.close()
     
 # Print to console our success
-print('Calibration successful. Calibration file used: {}'.format('tello_calibration.pckl'))
+print('Calibration successful. Calibration file saved: {}'.format('tello_calibration.pckl'))

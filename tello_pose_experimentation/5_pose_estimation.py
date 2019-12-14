@@ -77,8 +77,6 @@ send("command")
 time.sleep(1)
 send("streamon")
 
-
-
 #--- Define Tag
 id_to_find  = 0
 marker_size  = 10 #- [cm]
@@ -141,7 +139,7 @@ R_flip[1,1] =-1.0
 R_flip[2,2] =-1.0
 
 #--- Define the aruco dictionary
-aruco_dict  = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
+aruco_dict  = aruco.getPredefinedDictionary(aruco.DICT_ARUCO_ORIGINAL)
 parameters  = aruco.DetectorParameters_create()
 
 
@@ -169,6 +167,8 @@ while True:
     #-- Find all the aruco markers in the image
     corners, ids, rejected = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters,
                               cameraMatrix=camera_matrix, distCoeff=camera_distortion)
+
+    print(ids)
     
     if ids is not None and ids[0] == id_to_find:
         
@@ -189,14 +189,26 @@ while True:
         str_position = "MARKER Position x=%4.0f  y=%4.0f  z=%4.0f"%(tvec[0], tvec[1], tvec[2])
         cv2.putText(frame, str_position, (0, 100), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        min_distance, max_distance = (60, 80)
+        min_x_distance, max_x_distance = (-10, 10)
+        min_z_distance, max_z_distance = (80, 100)
+    
 
-        if tvec[2] < min_distance:
-            send("back 20")
-            print("flying backward: current_distance is: " + str(tvec[2]))
-        elif tvec[2] > max_distance:
-            send("forward 20")
-            print("flying forward: current_distance is: " + str(tvec[2]))
+
+        # X distance from marker
+        if tvec[0] < min_x_distance:
+            print("right")
+            send("left 20")
+        elif tvec[0] > max_x_distance:
+            print("left")
+            send("right 20")
+
+        # Z distance from marker
+        #if tvec[2] < min_z_distance:
+            #send("back 20")
+            #print("flying backward: current_distance is: " + str(tvec[2]))
+        #elif tvec[2] > max_z_distance:
+            #send("forward 20")
+            #print("flying forward: current_distance is: " + str(tvec[2]))
 
         # #-- Obtain the rotation matrix tag->camera
         # R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])

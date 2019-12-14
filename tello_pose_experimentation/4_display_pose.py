@@ -7,7 +7,7 @@ import pickle
 
 marker_length = .04 # 4 cm
 aruco_params = aruco.DetectorParameters_create()
-aruco_dict = aruco.Dictionary_get(aruco.DICT_5X5_1000)
+aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
 
 # Check for camera calibration data
 if not os.path.exists('./tello_calibration.pckl'):
