@@ -78,8 +78,8 @@ time.sleep(1)
 send("streamon")
 
 #--- Define Tag
-id_to_find  = 0
-marker_size  = 10 #- [cm]
+id_to_find  = 4
+marker_size  = 17.5 #- [cm]
 
 #------------------------------------------------------------------------------
 #------- ROTATIONS https://www.learnopencv.com/rotation-matrix-to-euler-angles/
@@ -156,6 +156,13 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 #-- Font for the text in the image
 font = cv2.FONT_HERSHEY_PLAIN
 
+sample_count = 32
+x_avg = []
+y_avg = []
+z_avg = []
+min_x_distance, max_x_distance = (-10, 10)
+min_z_distance, max_z_distance = (80, 100)
+
 while True:
 
     #-- Read the camera frame
@@ -167,9 +174,8 @@ while True:
     #-- Find all the aruco markers in the image
     corners, ids, rejected = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters,
                               cameraMatrix=camera_matrix, distCoeff=camera_distortion)
-
-    print(ids)
     
+    # Detect ID specified above
     if ids is not None and ids[0] == id_to_find:
         
         #-- ret = [rvec, tvec, ?]
@@ -187,28 +193,55 @@ while True:
 
         #-- Print the tag position in camera frame
         str_position = "MARKER Position x=%4.0f  y=%4.0f  z=%4.0f"%(tvec[0], tvec[1], tvec[2])
-        cv2.putText(frame, str_position, (0, 100), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, str_position, (20, 20), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        min_x_distance, max_x_distance = (-10, 10)
-        min_z_distance, max_z_distance = (80, 100)
-    
+        x_translation = tvec[0]
+        y_translation = tvec[1]
+        z_translation = tvec[2]
+
+        x_avg.append(x_translation)
+        y_avg.append(y_translation)
+        z_avg.append(z_translation)
+
+        if len(x_avg) == 31 and len(z_avg) == 31:
+            x_translation = int(sum(x_avg)/len(x_avg))
+            z_translation = int(sum(z_avg)/len(z_avg))
+
+            # Reset the arrays
+            x_avg = []
+            z_avg = []
+
+            # We'll use this value to send to Tello
+            x_offset = 0
+            z_offset = 0
+
+            # X distance from marker. This is the Y axis (left/right) in Tello's world
+            if x_translation < min_x_distance:
+                x_offset = -20
+            elif x_translation > max_x_distance:
+                x_offset = 20
+
+            # Y distance from marker. This is the Z axis (up/down) in Tello's world
+
+            # Z distance from marker. This is the X axis (forward/backward) in Tello's world
+            if z_translation < min_z_distance:
+                z_offset = -20
+            elif z_translation > max_z_distance:
+                z_offset = 20
 
 
-        # X distance from marker
-        if tvec[0] < min_x_distance:
-            print("right")
-            send("left 20")
-        elif tvec[0] > max_x_distance:
-            print("left")
-            send("right 20")
+            # The go SDK command in Tello operates as follows:
+            # X represents forward(+) backward(-)
+            # Y represents left right
+            # Z represents up down
 
-        # Z distance from marker
-        #if tvec[2] < min_z_distance:
-            #send("back 20")
-            #print("flying backward: current_distance is: " + str(tvec[2]))
-        #elif tvec[2] > max_z_distance:
-            #send("forward 20")
-            #print("flying forward: current_distance is: " + str(tvec[2]))
+            command = "go " + str(z_offset) + " " + str(x_offset) + " 0 50"
+
+            print(command)
+
+            send(command)
+
+        
 
         # #-- Obtain the rotation matrix tag->camera
         # R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])
