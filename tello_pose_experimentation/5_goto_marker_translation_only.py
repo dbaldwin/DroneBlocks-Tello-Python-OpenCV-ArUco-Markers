@@ -42,8 +42,8 @@ time.sleep(1)
 send("streamon")
 
 # Which marker to find
-id_to_find  = 5
-marker_size  = 17.5 # cm
+id_to_find = 4
+marker_size = 17.5 # size in cm
 
 # Load camera parameters
 if not os.path.exists('./tello_calibration.pckl'):
@@ -79,6 +79,8 @@ sample_count = 32
 x_avg = []
 y_avg = []
 z_avg = []
+
+# The range of values where we want the marker center to be in the camera view
 min_x_distance, max_x_distance = (-10, 10) # Y in Tello's world
 min_y_distance, max_y_distance = (-10, 10) # Z in Tello's world
 min_z_distance, max_z_distance = (80, 100) # X in Tello's world
@@ -151,7 +153,7 @@ while True:
             if z_translation < min_z_distance:
                 z_offset = -20
             elif z_translation > max_z_distance:
-                z_offset = 20
+                z_offset = 60
 
 
             # The go SDK command in Tello operates as follows:
@@ -180,3 +182,5 @@ while True:
         break
     if key == ord(' '):
         send('takeoff')
+        #time.sleep(6)
+        #send('up 120')
