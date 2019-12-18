@@ -1,3 +1,7 @@
+# 1. Power up Tello
+# 2. Connect to Tello network
+# 3. Run this script with Python
+
 import cv2
 import os
 import time
