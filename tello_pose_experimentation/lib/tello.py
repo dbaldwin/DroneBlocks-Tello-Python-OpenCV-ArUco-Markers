@@ -16,3 +16,7 @@ class Tello:
 
     def receive(self):
         return
+
+
+    def close(self):
+        self.sock.close()

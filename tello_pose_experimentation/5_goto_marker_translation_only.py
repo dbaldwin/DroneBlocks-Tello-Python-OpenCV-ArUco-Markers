@@ -91,11 +91,11 @@ while True:
     # Read the camera frame
     ret, frame = cap.read()
 
-    # Convert in gray scale
+    # Convert to gray scale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Find all the aruco markers in the image
-    corners, ids, rejected = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters,
+    corners, ids, _ = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters,
                               cameraMatrix=camera_matrix, distCoeff=camera_distortion)
     
     # Detect ID specified above
