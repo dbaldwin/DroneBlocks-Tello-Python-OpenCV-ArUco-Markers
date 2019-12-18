@@ -153,7 +153,7 @@ while True:
             if z_translation < min_z_distance:
                 z_offset = -20
             elif z_translation > max_z_distance:
-                z_offset = 60
+                z_offset = 40
 
 
             # The go SDK command in Tello operates as follows:
