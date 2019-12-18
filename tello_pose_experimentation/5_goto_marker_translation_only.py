@@ -42,7 +42,7 @@ time.sleep(1)
 send("streamon")
 
 # Which marker to find
-id_to_find = 4
+id_to_find = 1
 marker_size = 17.5 # size in cm
 
 # Load camera parameters
@@ -101,10 +101,11 @@ while True:
     # Detect ID specified above
     if ids is not None and ids[0] == id_to_find:
         
-        ret = aruco.estimatePoseSingleMarkers(corners, marker_size, camera_matrix, camera_distortion)
+        rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, marker_size, camera_matrix, camera_distortion)
 
-        # Unpack the output, get only the first
-        rvec, tvec = ret[0][0,0,:], ret[1][0,0,:]
+        # Unpack the values
+        rvec = rvec[0,0,:]
+        tvec = tvec[0,0,:]
 
         # Draw the detected marker and put a reference frame over it
         aruco.drawDetectedMarkers(frame, corners)
