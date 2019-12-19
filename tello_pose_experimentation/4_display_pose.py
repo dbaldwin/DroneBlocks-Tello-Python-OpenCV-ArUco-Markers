@@ -4,8 +4,22 @@ import numpy as np
 import math
 import os
 import pickle
+import time
+from lib.tello import Tello
 
-marker_length = .04 # 4 cm
+# Construct a Tello instance so we can communicate with it over UDP
+tello = Tello()
+
+# Send the command string to wake Tello up
+tello.send("command")
+
+# Delay
+time.sleep(1)
+
+# Initialize the video stream which will start sending to port 11111
+tello.send("streamon")
+
+marker_length = 17.5 # 175mm/17.5cm
 aruco_params = aruco.DetectorParameters_create()
 aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
 
@@ -21,12 +35,9 @@ else:
         print("Calibration issue. Remove ./tello_calibration.pckl and recalibrate your camera with CalibrateCamera.py.")
         exit()
 
-axis = np.array([[marker_length,0,0], [0,marker_length,0], [0,0,marker_length*-1]]).reshape(-1,3)
-
-# Get the video stream
-#cam = cv2.VideoCapture(0) # webcam
-cam = cv2.VideoCapture('udp://127.0.0.1:11111') # Tello video from stream
-#cam = cv2.VideoCapture('../videos/tello.avi') # Tello video from file
+# Get Tello video stream
+cam = cv2.VideoCapture('udp://127.0.0.1:11111')
+#cam = cv2.VideoCapture('./utils/20191219-104330.avi')
     
 while True:
     ret, img = cam.read()
@@ -44,53 +55,59 @@ while True:
         for i in range(ids.size):
             img_aruco = aruco.drawAxis(img_aruco, camera_matrix, distortion_coefficients, rvec[i], tvec[i], marker_length)
 
-        
-        if rvec.size == 3:
-            imgpts, _ = cv2.projectPoints(axis, rvec, tvec, camera_matrix, distortion_coefficients)
+            # Plot a point at the center of the image
+            cv2.circle(img_aruco, (480, 360), 3, (255, 255, 0), -1)
 
-            p1 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
+            #cv2.rectangle(img_aruco, (0, 620), (200, 720), (0, 0, 0), -1)
+
+
+
+        # if rvec.size == 3:
+        #     imgpts, _ = cv2.projectPoints(axis, rvec, tvec, camera_matrix, distortion_coefficients)
+
+        #     p1 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
                 
-            if p1 is not None:
-                cv2.circle(img_aruco, p1, 5, (0, 0, 255), -1)
+        #     if p1 is not None:
+        #         cv2.circle(img_aruco, p1, 5, (0, 0, 255), -1)
 
-            p2 = (int(imgpts[1][0][0]), int(imgpts[1][0][1]))
+        #     p2 = (int(imgpts[1][0][0]), int(imgpts[1][0][1]))
 
-            if p2 is not None:
-                cv2.circle(img_aruco, p2, 5, (0, 255, 0), -1)
+        #     if p2 is not None:
+        #         cv2.circle(img_aruco, p2, 5, (0, 255, 0), -1)
 
-            p3 = (int(imgpts[2][0][0]), int(imgpts[2][0][1]))
+        #     p3 = (int(imgpts[2][0][0]), int(imgpts[2][0][1]))
             
-            if p3 is not None:
-                cv2.circle(img_aruco, p3, 5, (255, 0, 0), -1)
+        #     if p3 is not None:
+        #         cv2.circle(img_aruco, p3, 5, (255, 0, 0), -1)
 
-            # Plot a point at the center
-            cv2.circle(img_aruco, (480, 320), 5, (0, 255, 0), -1)
+        #     # Plot a point at the center of the image
+        #     cv2.circle(img_aruco, (480, 360), 5, (0, 255, 0), -1)
 
-            tvec_x = tvec[0][0][0]
-            tvec_y = tvec[0][0][1]
-            tvec_z = tvec[0][0][2]
+        #     tvec_x = tvec[0][0][0]
+        #     tvec_y = tvec[0][0][1]
+        #     tvec_z = tvec[0][0][2]
 
-            # Distance from camera is the magnitude of tvec
-            distance = math.sqrt(tvec_x*tvec_x + tvec_y*tvec_y + tvec_z*tvec_z)
-            print(distance)
+        #     # Distance from camera is the magnitude of tvec
+        #     distance = math.sqrt(tvec_x*tvec_x + tvec_y*tvec_y + tvec_z*tvec_z)
+        #     print(distance)
 
-            # Let's focus on keeping the marker centered on the x axis (roll left/right)
-            # This means we'll consider y and z constant for this demonstration
+        #     # Let's focus on keeping the marker centered on the x axis (roll left/right)
+        #     # This means we'll consider y and z constant for this demonstration
 
-            # Calculate angle of vectors
-            array = np.array([tvec_x, tvec_y, tvec_z])
-            array_mag = np.linalg.norm(array)
+        #     # Calculate angle of vectors
+        #     array = np.array([tvec_x, tvec_y, tvec_z])
+        #     array_mag = np.linalg.norm(array)
 
-            # Vector to center of screen
-            array2 = np.array([0, 0, tvec_z])
-            array2_mag = np.linalg.norm(array2)
+        #     # Vector to center of screen
+        #     array2 = np.array([0, 0, tvec_z])
+        #     array2_mag = np.linalg.norm(array2)
 
-            dot = np.dot(array, array2)
+        #     dot = np.dot(array, array2)
 
-            # Solve for angle
-            cos = np.arccos(dot/(array_mag*array2_mag))
+        #     # Solve for angle
+        #     cos = np.arccos(dot/(array_mag*array2_mag))
 
-            degrees = np.degrees(cos)
+        #     degrees = np.degrees(cos)
 
             #print(degrees)
 
@@ -113,9 +130,17 @@ while True:
     else:
         img_aruco = img
 
-    cv2.imshow("Aruco Marker Detection", img_aruco)
+    cv2.imshow("Tello", img_aruco)
     
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord('q'):
         break
+
+    # Press space bar to take photo
+    if key == ord(' '):
+        file_path = os.getcwd()
+        file_name = time.strftime("%Y%m%d-%H%M%S")
+        cv2.imwrite(file_path + "/" + file_name + ".jpg", img_aruco)
 
 cv2.destroyAllWindows()
