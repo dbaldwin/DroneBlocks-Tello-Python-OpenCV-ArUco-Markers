@@ -115,11 +115,11 @@ while True:
 
             # If yaw average is negative then yaw left (ccw)
             if yaw_avg < min_yaw_range:
-                tello.send("ccw 15")
+                tello.send("ccw " + str(abs(yaw_avg)))
                 print("yawing left")
             # If yaw average is positive then yaw right (cw)
             elif yaw_avg > max_yaw_range:
-                tello.send("cw 15")
+                tello.send("cw " + str(abs(yaw_avg)))
                 print("yawing right")
 
             # Reset the array
